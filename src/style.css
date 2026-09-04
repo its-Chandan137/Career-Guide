@@ -18,8 +18,14 @@
   --radius:20px;
   --radiusLg:28px;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:84px;
+}
+@media(prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth}
+}
 body{
   margin:0;
   font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
@@ -28,10 +34,20 @@ body{
   line-height:1.5;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:contain;
 }
-a{color:inherit}
-button{font:inherit}
+a, button{
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
+}
+a:focus, button:focus{outline:none}
+a:focus-visible, button:focus-visible{
+  outline:2px solid rgba(167,139,250,.55);
+  outline-offset:2px;
+  border-radius:12px;
+}
 img{max-width:100%; display:block}
+::selection{background:rgba(139,92,246,.35); color:#fff}
 
 /* animated mesh bg */
 .mesh{
@@ -278,9 +294,18 @@ img{max-width:100%; display:block}
 .chipMini{font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; padding:6px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.08); color:#E2E8F0}
 .divider{height:1px; background:rgba(255,255,255,.08); margin:12px 0}
 
-/* reveal */
+/* reveal + premium page fade */
+.shell{
+  animation:pageIn .42s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes pageIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
 .reveal{opacity:0; transform:translateY(14px) scale(.98); transition: .6s cubic-bezier(.2,.8,.2,1)}
 .reveal.in{opacity:1; transform:translateY(0) scale(1)}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{transition:none; opacity:1; transform:none}
+  .shell{animation:none}
+}
 
 /* section */
 .section{padding:22px 0}
@@ -320,10 +345,22 @@ tr:last-child td{border-bottom:none}
 .search i{position:absolute; left:12px; top:50%; transform:translateY(-50%); font-style:normal; color:var(--muted)}
 .pillScroller{
   display:flex; gap:8px; align-items:center; flex:1 1 280px; overflow-x:auto; overflow-y:hidden;
-  scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; scroll-snap-type:x proximity;
-  padding:2px 0 6px; margin:0 -14px; padding-inline:14px;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; scroll-snap-type:x mandatory;
+  padding:4px 0 10px; margin:0 -14px; padding-inline:14px;
+  overscroll-behavior-x:contain;
+  touch-action:pan-x;
+  -webkit-mask:linear-gradient(90deg, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+  cursor:grab;
+  will-change:scroll-position;
 }
+.pillScroller:active{cursor:grabbing}
 .pillScroller::-webkit-scrollbar{display:none}
+.pillScroller.dragging{scroll-behavior:auto; scroll-snap-type:none; user-select:none}
+/* smooth momentum: hide abrupt stops */
+.pillScroller{scroll-padding-inline:14px}
+@media(prefers-reduced-motion:reduce){
+  .pillScroller{scroll-behavior:auto; scroll-snap-type:none}
+}
 .tabPill{
   flex:0 0 auto; scroll-snap-align:start;
   border:1px solid rgba(255,255,255,.13); background:rgba(255,255,255,.07); color:rgba(255,255,255,.78);
@@ -360,9 +397,14 @@ tr:last-child td{border-bottom:none}
 .college{
   border-radius:20px; overflow:hidden; border:1px solid rgba(255,255,255,.1);
   background:rgba(255,255,255,.06); backdrop-filter:blur(16px);
-  display:flex; flex-direction:column; transition:.2s;
+  display:flex; flex-direction:column; transition:transform .22s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
 }
 .college:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.16); box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.college:active{transform:scale(.985)}
+.college:focus{outline:none}
+.college:focus-visible{outline:2px solid rgba(167,139,250,.5); outline-offset:2px}
 .collegeImg{height:132px; position:relative; overflow:hidden; background:#0B1020}
 .collegeImg img{width:100%; height:100%; object-fit:cover; opacity:.9}
 .collegeImg::after{content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 20%, rgba(7,10,18,.82) 100%)}
@@ -435,6 +477,11 @@ tr:last-child td{border-bottom:none}
   background:rgba(18,24,46,.96); border:1px solid rgba(255,255,255,.12); border-radius:24px;
   box-shadow:0 24px 80px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.08) inset;
   animation:sheetIn .24s cubic-bezier(.2,.8,.2,1);
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+  will-change:scroll-position;
+  scrollbar-gutter:stable;
 }
 @keyframes sheetIn{from{opacity:0; transform:translateY(14px) scale(.98)}to{opacity:1; transform:translateY(0) scale(1)}}
 .modalImg{height:210px; position:relative; overflow:hidden; background:#0B1020}
@@ -448,7 +495,11 @@ tr:last-child td{border-bottom:none}
 .modalTitle{position:absolute; left:16px; right:16px; bottom:14px; z-index:2}
 .modalTitle h3{font-family:Fraunces,serif; font-size:18px; margin:8px 0 0; line-height:1.1}
 .modalTitle p{margin:4px 0 0; font-size:12px; font-weight:800; color:#CBD5E1}
-.modalBody{padding:16px}
+.modalBody{
+  padding:16px;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+}
 .modalGrid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
 .modalStat{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:10px; text-align:center}
 .modalStat b{font-size:13px; display:block; line-height:1}
@@ -460,10 +511,15 @@ tr:last-child td{border-bottom:none}
 .modalSection.bad{background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.18)}
 @media(max-width:640px){
   .modalOverlay{padding:0; align-items:end}
-  .modalSheet{width:100%; max-height:92vh; border-radius:24px 24px 0 0; animation:sheetUp .28s cubic-bezier(.2,.8,.2,1)}
+  .modalSheet{
+    width:100%; max-height:92vh; border-radius:24px 24px 0 0; animation:sheetUp .28s cubic-bezier(.2,.8,.2,1);
+    scroll-snap-type:y proximity;
+    -webkit-overflow-scrolling:touch;
+  }
   @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .modalImg{height:190px}
+  .modalImg{height:190px; flex-shrink:0}
   .modalGrid{grid-template-columns:repeat(2,1fr)}
+  .modalBody{padding-bottom:28px}
 }
 
 /* phone bottom bar */
