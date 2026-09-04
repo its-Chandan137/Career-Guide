@@ -12,8 +12,8 @@ export default function Home(){
  <div className="heroContent">
  <div className="glass glassPad reveal in">
  <span className="eyebrow">Komal, your personal guide</span>
- <h1 className="h1">Komal, no more drop.<br/><i>Your degree + NEET 2027</i> together with your career by 2030.</h1>
- <p className="h1sub">You’re 20 now, <b>21 in December</b> • <b>OBC</b> • <b>Jashpur, CG</b> • 2 NEET attempts done • You love <b>Forensic + Pharmacy</b> • Your next NEET is <b>May 2027</b>. You want to stay near Jashpur to Bilaspur. Hyderabad only if <b>you</b> want.</p>
+  <h1 className="h1">Komal, your future starts now.<br/><i>Your degree plus NEET 2027</i> together with your career by 2030.</h1>
+  <p className="h1sub">You’re 20 now, <b>21 in December</b> • <b>OBC</b> • <b>Jashpur, CG</b> • You love <b>Forensic and Pharmacy</b> • Your next NEET is <b>May 2027</b>. You want to stay near Jashpur to Bilaspur. Hyderabad only if <b>you</b> want.</p>
 
  <div className="miniGrid">
  <div className="mini"><i>🎯</i><div><b>Your goal: MBBS if you crack NEET</b><span>Else your strong backup by 2030</span></div></div>

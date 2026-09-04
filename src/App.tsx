@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, Link, useLocation } from 'react-router-dom'
+import Lenis from 'lenis'
 import { type College } from './data'
 import Home from './pages/Home'
 import Vacancies from './pages/Vacancies'
@@ -8,29 +9,60 @@ import Colleges from './pages/Colleges'
 import Plan from './pages/Plan'
 
 function useReveal(){
- const ref = useRef<HTMLDivElement>(null)
- const loc = useLocation()
- useEffect(()=>{
- const el = ref.current
- if(!el) return
- // re-run reveal after route change
- requestAnimationFrame(()=>{
- el.querySelectorAll('.reveal').forEach(n=> n.classList.remove('in'))
- const io = new IntersectionObserver((entries)=>{
- entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in') })
- }, {threshold:0.12})
- el.querySelectorAll('.reveal').forEach(n=>io.observe(n))
- // force hero visible immediately
- el.querySelectorAll('.heroWrap, .heroWrap .reveal').forEach(n=>n.classList.add('in'))
- return ()=>io.disconnect()
- })
- },[loc.pathname])
- // premium smooth scroll to top on route
- useEffect(()=>{
- const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
- window.scrollTo({top:0, behavior: prefersReduced ? 'auto' : 'smooth'})
- },[loc.pathname])
- return ref
+  const ref = useRef<HTMLDivElement>(null)
+  const loc = useLocation()
+  useEffect(()=>{
+    const el = ref.current
+    if(!el) return
+    requestAnimationFrame(()=>{
+      el.querySelectorAll('.reveal').forEach(n=> n.classList.remove('in'))
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in') })
+      }, {threshold:0.12})
+      el.querySelectorAll('.reveal').forEach(n=>io.observe(n))
+      el.querySelectorAll('.heroWrap, .heroWrap .reveal').forEach(n=>n.classList.add('in'))
+      return ()=>io.disconnect()
+    })
+  },[loc.pathname])
+  return ref
+}
+
+function usePremiumScroll(){
+  const loc = useLocation()
+  const lenisRef = useRef<Lenis|null>(null)
+  useEffect(()=>{
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if(prefersReduced) return
+    const lenis = new Lenis({
+      duration: 1.35,
+      easing: (t:number)=> 1 - Math.pow(1 - t, 3),
+      lerp: 0.075,
+      smoothWheel: true,
+      touchMultiplier: 1.15,
+      infinite: false,
+      gestureOrientation: 'vertical',
+    })
+    lenisRef.current = lenis
+    let raf = 0
+    const rafFn = (time:number)=>{ lenis.raf(time); raf = requestAnimationFrame(rafFn) }
+    raf = requestAnimationFrame(rafFn)
+    const onResize = ()=> lenis.resize()
+    window.addEventListener('resize', onResize)
+    return ()=>{
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', onResize)
+      lenis.destroy()
+      lenisRef.current = null
+    }
+  },[])
+  useEffect(()=>{
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if(prefersReduced){ window.scrollTo({top:0, behavior:'auto'}); return }
+    lenisRef.current?.scrollTo(0, { immediate:false, duration:1.1, easing:(t:number)=>1-Math.pow(1-t,3) })
+    // fallback
+    setTimeout(()=> window.scrollTo({top:0, behavior:'smooth'}), 40)
+  },[loc.pathname])
+  return lenisRef
 }
 
 function Layout({ children, bottomActive, setBottomActive }:{ children:React.ReactNode, bottomActive: 'colleges'|'checklist'|null, setBottomActive:(v:'colleges'|'checklist'|null)=>void }){
@@ -93,9 +125,10 @@ function Layout({ children, bottomActive, setBottomActive }:{ children:React.Rea
 }
 
 function RoutedApp(){
- const [selected, setSelected] = useState<College|null>(null)
- const [bottomActive, setBottomActive] = useState<'colleges'|'checklist'|null>(null)
- const rootRef = useReveal()
+  const [selected, setSelected] = useState<College|null>(null)
+  const [bottomActive, setBottomActive] = useState<'colleges'|'checklist'|null>(null)
+  const rootRef = useReveal()
+  usePremiumScroll()
 
  useEffect(()=>{
  if(selected) document.body.style.overflow='hidden'
