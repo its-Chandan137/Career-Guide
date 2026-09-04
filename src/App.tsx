@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, Link, useLocation } from 'react-router-dom'
 import Lenis from 'lenis'
 import { type College } from './data'
+import { useLang } from './i18n'
 import Home from './pages/Home'
 import Vacancies from './pages/Vacancies'
 import Picks from './pages/Picks'
@@ -34,13 +35,17 @@ function usePremiumScroll(){
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if(prefersReduced) return
     const lenis = new Lenis({
-      duration: 1.35,
+      duration: 1.42,
       easing: (t:number)=> 1 - Math.pow(1 - t, 3),
-      lerp: 0.075,
+      lerp: 0.068,
       smoothWheel: true,
-      touchMultiplier: 1.15,
+      syncTouch: true,
+      syncTouchLerp: 0.078,
+      touchInertiaMultiplier: 34,
+      touchMultiplier: 1.45,
       infinite: false,
       gestureOrientation: 'vertical',
+      autoResize: true,
     })
     lenisRef.current = lenis
     let raf = 0
@@ -66,67 +71,75 @@ function usePremiumScroll(){
 }
 
 function Layout({ children, bottomActive, setBottomActive }:{ children:React.ReactNode, bottomActive: 'colleges'|'checklist'|null, setBottomActive:(v:'colleges'|'checklist'|null)=>void }){
- const [drawer, setDrawer] = useState(false)
- const loc = useLocation()
- const isActive = (path:string)=> loc.pathname===path
+  const [drawer, setDrawer] = useState(false)
+  const { t, lang, setLang } = useLang()
 
- return (
- <>
- <div className="mesh"><div className="blob blob1"/><div className="blob blob2"/><div className="blob blob3"/></div>
- <div className="gridOverlay" />
+  return (
+    <>
+      <div className="mesh"><div className="blob blob1"/><div className="blob blob2"/><div className="blob blob3"/></div>
+      <div className="gridOverlay" />
 
- <div className="ticker">
- <span className="live">● LIVE</span>
- <div className="marquee"><span>Komal your Spot Counselling is <b>8 Sept 2026, 11 AM • Report to dept</b> • Even <u>without CUET</u> you can apply on 12th marks • B.Pharm OBC at GGU = 0 → don’t target GGU for pharmacy • Forensic 13 OBC • Biotech 9 OBC • Verify morning of 8 Sept </span></div>
- <Link to="/plan">Your Checklist ↓</Link>
- </div>
+      <div className="ticker">
+        <span className="live">{t('tickerLive')}</span>
+        <div className="marquee"><span dangerouslySetInnerHTML={{__html: t('tickerText')}} /></div>
+        <Link to="/plan">{t('tickerBtn')}</Link>
+      </div>
 
- <div className="navWrap">
- <nav className="navPill" aria-label="Primary">
- <Link className="brandMini" to="/">
- <div className="mark">K</div>
- <div><b>Komal’s Guide</b><span>Your → Jashpur • Bilaspur • Hyd</span></div>
- </Link>
- <div className="links">
- <NavLink to="/" className={({isActive})=> isActive ? 'active' : ''}>Home</NavLink>
- <NavLink to="/vacancies" className={({isActive})=> isActive ? 'active' : ''}>Vacancies</NavLink>
- <NavLink to="/picks" className={({isActive})=> isActive ? 'active' : ''}>Top Picks</NavLink>
- <NavLink to="/colleges" className={({isActive})=> isActive ? 'active' : ''}>Colleges</NavLink>
- <NavLink to="/plan" className={({isActive})=> isActive ? 'active' : ''}>Your Plan</NavLink>
- </div>
- <button className="menuBtn" aria-label="Menu" onClick={()=>setDrawer(v=>!v)}>{drawer ? '✕' : '☰'}</button>
- </nav>
- </div>
+      <div className="navWrap">
+        <nav className="navPill" aria-label="Primary">
+          <Link className="brandMini" to="/">
+            <div className="mark">K</div>
+            <div><b>{t('brandTitle')}</b><span>{t('brandSub')}</span></div>
+          </Link>
+          <div className="links">
+            <NavLink to="/" className={({isActive})=> isActive ? 'active' : ''}>{t('navHome')}</NavLink>
+            <NavLink to="/vacancies" className={({isActive})=> isActive ? 'active' : ''}>{t('navVacancies')}</NavLink>
+            <NavLink to="/picks" className={({isActive})=> isActive ? 'active' : ''}>{t('navPicks')}</NavLink>
+            <NavLink to="/colleges" className={({isActive})=> isActive ? 'active' : ''}>{t('navColleges')}</NavLink>
+            <NavLink to="/plan" className={({isActive})=> isActive ? 'active' : ''}>{t('navPlan')}</NavLink>
+          </div>
+          <div className="langToggle" role="group" aria-label="Language">
+            <button type="button" className={lang==='en' ? 'active' : ''} onClick={()=>setLang('en')}>{t('langEn')}</button>
+            <button type="button" className={lang==='hi' ? 'active' : ''} onClick={()=>setLang('hi')}>{t('langHi')}</button>
+          </div>
+          <button className="menuBtn" aria-label="Menu" onClick={()=>setDrawer(v=>!v)}>{drawer ? '✕' : '☰'}</button>
+        </nav>
+      </div>
 
- <div className={`drawer ${drawer ? 'open' : ''}`} onClick={()=>setDrawer(false)}>
- <div className="drawerBg" />
- <div className="drawerCard" onClick={e=>e.stopPropagation()}>
- <NavLink to="/" onClick={()=>setDrawer(false)}>Home <span>→</span></NavLink>
- <NavLink to="/vacancies" onClick={()=>setDrawer(false)}>Your Vacancies <span>→</span></NavLink>
- <NavLink to="/picks" onClick={()=>setDrawer(false)}>Your Top Picks <span>→</span></NavLink>
- <NavLink to="/colleges" onClick={()=>setDrawer(false)}>Your 10 Colleges <span>→</span></NavLink>
- <NavLink to="/plan" onClick={()=>setDrawer(false)}>Your NEET 2027 Plan <span>→</span></NavLink>
- </div>
- </div>
+      <div className={`drawer ${drawer ? 'open' : ''}`} onClick={()=>setDrawer(false)}>
+        <div className="drawerBg" />
+        <div className="drawerCard" onClick={e=>e.stopPropagation()}>
+          <NavLink to="/" onClick={()=>setDrawer(false)}>{t('navHome')} <span>→</span></NavLink>
+          <NavLink to="/vacancies" onClick={()=>setDrawer(false)}>{t('navVacancies')} <span>→</span></NavLink>
+          <NavLink to="/picks" onClick={()=>setDrawer(false)}>{t('navPicks')} <span>→</span></NavLink>
+          <NavLink to="/colleges" onClick={()=>setDrawer(false)}>{t('navColleges')} <span>→</span></NavLink>
+          <NavLink to="/plan" onClick={()=>setDrawer(false)}>{t('navPlan')} <span>→</span></NavLink>
+          <div className="langToggle" style={{marginTop:6, justifyContent:'center'}}>
+            <button type="button" className={lang==='en' ? 'active' : ''} onClick={()=>setLang('en')}>{t('langEn')}</button>
+            <button type="button" className={lang==='hi' ? 'active' : ''} onClick={()=>setLang('hi')}>{t('langHi')}</button>
+          </div>
+        </div>
+      </div>
 
- <main className="shell">
- {children}
- <div style={{height:12}} />
- </main>
+      <main className="shell">
+        {children}
+        <div style={{height:12}} />
+      </main>
 
- <div className="bottomBar">
- <NavLink to="/colleges" className={({isActive})=> isActive ? 'active' : ''} onClick={()=>setBottomActive('colleges')}>Your colleges</NavLink>
- <NavLink to="/plan" className={({isActive})=> isActive ? 'active' : ''} onClick={()=>setBottomActive('checklist')}>Your checklist</NavLink>
- </div>
+      <div className="bottomBar">
+        <NavLink to="/colleges" className={({isActive})=> isActive ? 'active' : ''} onClick={()=>setBottomActive('colleges')}>{t('bottomColleges')}</NavLink>
+        <NavLink to="/plan" className={({isActive})=> isActive ? 'active' : ''} onClick={()=>setBottomActive('checklist')}>{t('bottomChecklist')}</NavLink>
+      </div>
 
- <footer className="footer"><div className="footerInner"><small>Made for you, Komal • Data: GGU vacancy PDF 03.09.2026 & college sites • Verify 8 Sept morning • Frontend only</small><small style={{display:'flex', gap:8, alignItems:'center'}}><span className="pill">5 pages • React Router</span><Link to="/" style={{fontWeight:900, textDecoration:'none'}}>↑ Top</Link></small></div></footer>
- </>
- )
+      <footer className="footer"><div className="footerInner"><small>{t('footerMade')}</small><small style={{display:'flex', gap:8, alignItems:'center'}}><span className="pill">5 pages • React Router</span><Link to="/" style={{fontWeight:900, textDecoration:'none'}}>↑ Top</Link></small></div></footer>
+    </>
+  )
 }
 
 function RoutedApp(){
   const [selected, setSelected] = useState<College|null>(null)
   const [bottomActive, setBottomActive] = useState<'colleges'|'checklist'|null>(null)
+  const { t } = useLang()
   const rootRef = useReveal()
   usePremiumScroll()
 
@@ -174,11 +187,11 @@ function RoutedApp(){
  <div className="modalStat"><b>{selected.fee}</b><span>Your fee</span></div>
  <div className="modalStat"><b>{selected.duration}</b><span>Duration</span></div>
  </div>
- <div className="modalSection"><h4>🎯 For you eligibility</h4><p>{selected.eligibility} • {selected.approval}</p></div>
- <div className="modalSection"><h4>🧬 How it helps your NEET 2027</h4><p>{selected.neetFit}</p></div>
- <div className="modalSection"><h4>💼 Your careers after</h4><div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:8}}>{selected.careers.map(c=> <span key={c} className="pill" style={{background:'rgba(139,92,246,.14)', borderColor:'rgba(139,92,246,.22)'}}>{c}</span>)}</div></div>
- <div className="modalSection"><h4>✅ Why pick this for you</h4><ul>{selected.pros.map(p=> <li key={p}>{p}</li>)}</ul></div>
- <div className="modalSection bad"><h4>⚠️ Check before you pay</h4><p>{selected.cons} get PCI 2026-27 PDF + intake letter + live seats + total fee in writing.</p></div>
+              <div className="modalSection"><h4>🎯 {t('modalEligibility')}</h4><p>{selected.eligibility} • {selected.approval}</p></div>
+              <div className="modalSection"><h4>🧬 {t('modalNeet')}</h4><p>{selected.neetFit}</p></div>
+              <div className="modalSection"><h4>💼 {t('modalCareers')}</h4><div style={{display:'flex', gap:6, flexWrap:'wrap', marginTop:8}}>{selected.careers.map(c=> <span key={c} className="pill" style={{background:'rgba(139,92,246,.14)', borderColor:'rgba(139,92,246,.22)'}}>{c}</span>)}</div></div>
+              <div className="modalSection"><h4>✅ {t('modalWhy')}</h4><ul>{selected.pros.map(p=> <li key={p}>{p}</li>)}</ul></div>
+              <div className="modalSection bad"><h4>⚠️ {t('modalCheck')}</h4><p>{selected.cons} get PCI 2026-27 PDF + intake letter + live seats + total fee in writing.</p></div>
  <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:14}}>
  {selected.phone !== ' ' && selected.phone && <a className="btn btnPrimary" href={`tel:${selected.phone.replace(/\s/g,'')}`} style={{flex:'1 1 auto', justifyContent:'center'}}>📞 Call {selected.phone}</a>}
  <button className="btn btnGhost" onClick={()=>setSelected(null)} style={{flex:'1 1 auto', justifyContent:'center'}}>Close</button>

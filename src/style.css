@@ -145,6 +145,16 @@ img{max-width:100%; display:block}
 }
 .links a:hover{background:rgba(255,255,255,.08); color:#fff}
 .links a.active{background:#fff !important; color:#0B1020 !important; box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.langToggle{
+  display:flex; gap:3px; align-items:center; padding:3px; border-radius:999px;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12);
+}
+.langToggle button{
+  border:none; background:transparent; color:rgba(255,255,255,.72); font-size:11px; font-weight:900;
+  padding:6px 10px; border-radius:999px; cursor:pointer; letter-spacing:.06em; transition:.16s;
+}
+.langToggle button.active{background:#fff; color:#0B1020; box-shadow:0 4px 12px rgba(255,255,255,.18)}
+.langToggle button:not(.active):hover{background:rgba(255,255,255,.08); color:#fff}
 .menuBtn{
   display:none; width:42px; height:42px; border-radius:999px; border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.08); color:#fff; place-items:center; cursor:pointer; flex-shrink:0;
@@ -152,8 +162,16 @@ img{max-width:100%; display:block}
 @media(max-width:760px){
   .links{display:none}
   .menuBtn{display:grid}
-  .navPill{width:100%; justify-content:space-between}
+  .navPill{width:100%; justify-content:space-between; gap:6px; padding:6px}
+  .navPill .langToggle{display:none}
+  .brandMini{padding:2px 6px 2px 4px; gap:8px}
+  .brandMini b{font-size:13px}
+  .brandMini span{font-size:9px}
   .marquee span{animation-duration:12s}
+}
+@media(max-width:380px){
+  .navPill{padding:6px}
+  .mark{width:32px; height:32px; font-size:16px}
 }
 
 /* mobile drawer */
@@ -168,8 +186,13 @@ img{max-width:100%; display:block}
   box-shadow:0 24px 60px rgba(0,0,0,.55); display:grid; gap:8px;
 }
 .drawerCard a{
-  padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08);
+  padding:14px 16px; border-radius:14px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.10);
   text-decoration:none; font-weight:800; font-size:14px; display:flex; justify-content:space-between; align-items:center;
+  color:#F1F5F9 !important;
+}
+.drawerCard a.active{
+  background:#fff !important; color:#0B1020 !important; border-color:#fff !important;
+  box-shadow:0 8px 20px rgba(255,255,255,.18);
 }
 .drawerCard a:active{transform:scale(.98)}
 

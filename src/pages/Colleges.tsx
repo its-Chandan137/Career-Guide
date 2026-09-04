@@ -1,7 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
 import { colleges, type College } from '../data'
+import { useLang } from '../i18n'
 
 export default function Colleges({ onSelect }:{ onSelect:(c:College)=>void }){
+  const { t } = useLang()
   const [active, setActive] = useState<'All'|'Jashpur'|'Bilaspur'|'Raigarh'|'Hyderabad'>('All')
   const [q, setQ] = useState('')
   const scrollerRef = useRef<HTMLDivElement>(null)
@@ -56,13 +58,13 @@ export default function Colleges({ onSelect }:{ onSelect:(c:College)=>void }){
     drag.current.raf = requestAnimationFrame(step)
   }
 
- return (
- <section className="section">
- <div className="sectionHead reveal in"><div><span className="eyebrow">10 colleges for you, Komal</span><h2>Your colleges near home first</h2><p>Tap any card for your full details. Private “Admissions Open” ≠ confirmed seat call before you pay.</p></div></div>
+  return (
+    <section className="section">
+      <div className="sectionHead reveal in"><div><span className="eyebrow">{t('collegesEyebrow')}</span><h2>{t('collegesTitle')}</h2><p>{t('collegesSub')}</p></div></div>
 
- <div className="filterRow reveal in">
- <div className="search"><i>🔎</i><input placeholder="Search your college…" value={q} onChange={e=>setQ(e.target.value)} aria-label="Search colleges" /></div>
- <span className="count">{filtered.length} for you</span>
+      <div className="filterRow reveal in">
+        <div className="search"><i>🔎</i><input placeholder={t('searchPlaceholder')} value={q} onChange={e=>setQ(e.target.value)} aria-label="Search colleges" /></div>
+        <span className="count">{filtered.length} {t('forYou')}</span>
   <div
     ref={scrollerRef}
     className="pillScroller"
@@ -86,7 +88,7 @@ export default function Colleges({ onSelect }:{ onSelect:(c:College)=>void }){
  <div className="collegeImg">
  <img src={c.img} alt={c.name} loading="lazy" />
  <span className="collegeImgTag">{idx+1} • {c.area} • {c.vacancy}</span>
- <span style={{position:'absolute', right:10, bottom:10, zIndex:2, background:'rgba(255,255,255,.92)', color:'#0B1020', padding:'5px 9px', borderRadius:999, fontSize:11, fontWeight:900}}>Tap for your details →</span>
+              <span style={{position:'absolute', right:10, bottom:10, zIndex:2, background:'rgba(255,255,255,.92)', color:'#0B1020', padding:'5px 9px', borderRadius:999, fontSize:11, fontWeight:900}}>{t('tapDetails')}</span>
  </div>
  <div className="collegeBody">
  <h3>{c.name}</h3>
@@ -104,21 +106,21 @@ export default function Colleges({ onSelect }:{ onSelect:(c:College)=>void }){
  </div>
  <div className="collegeFoot" onClick={e=>e.stopPropagation()}>
  {c.phone!==' ' && c.phone && <a className="btn btnGhost" style={{padding:'8px 12px', fontSize:12}} href={`tel:${c.phone.replace(/\s/g,'')}`}>📞 {c.phone}</a>}
- <small style={{color:'var(--muted)', fontSize:11, fontWeight:800}}>Verify PCI 2026-27 • your fee</small>
+              <small style={{color:'var(--muted)', fontSize:11, fontWeight:800}}>{t('verifyNote')}</small>
  <span className="fee">{c.fee}</span>
  </div>
  </button>
  ))}
  </div>
 
- <div className="glass glassPad reveal" style={{marginTop:14, background:'rgba(255,255,255,.04)'}}>
- <h3 style={{fontFamily:'Fraunces,serif', margin:0, fontSize:14}}>Komal, before you pay any private B.Pharm fee get in writing:</h3>
- <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:10}}>
- {['PCI approval 2026-27 PDF','Intake letter','Live seats for you','Your total 4-yr fee','Hostel + mess','Last 3 yrs placements'].map(x=>(
- <span key={x} className="pill">{x}</span>
- ))}
- </div>
- </div>
+      <div className="glass glassPad reveal" style={{marginTop:14, background:'rgba(255,255,255,.04)'}}>
+        <h3 style={{fontFamily:'Fraunces,serif', margin:0, fontSize:14}}>{t('beforePayTitle')}</h3>
+        <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:10}}>
+          {['PCI approval 2026-27 PDF','Intake letter','Live seats for you','Your total 4-yr fee','Hostel + mess','Last 3 yrs placements'].map(x=>(
+            <span key={x} className="pill">{x}</span>
+          ))}
+        </div>
+      </div>
  </section>
  )
 }
