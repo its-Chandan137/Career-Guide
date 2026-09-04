@@ -41,7 +41,6 @@ function usePremiumScroll(){
       smoothWheel: true,
       syncTouch: true,
       syncTouchLerp: 0.078,
-      touchInertiaMultiplier: 34,
       touchMultiplier: 1.45,
       infinite: false,
       gestureOrientation: 'vertical',
