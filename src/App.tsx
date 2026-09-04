@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, Link, useLocation } from 'react-router-dom'
-import Lenis from 'lenis'
 import { type College } from './data'
 import { useLang } from './i18n'
 import Home from './pages/Home'
@@ -30,43 +29,11 @@ function useReveal(){
 
 function usePremiumScroll(){
   const loc = useLocation()
-  const lenisRef = useRef<Lenis|null>(null)
   useEffect(()=>{
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if(prefersReduced) return
-    const lenis = new Lenis({
-      duration: 1.42,
-      easing: (t:number)=> 1 - Math.pow(1 - t, 3),
-      lerp: 0.068,
-      smoothWheel: true,
-      syncTouch: true,
-      syncTouchLerp: 0.078,
-      touchMultiplier: 1.45,
-      infinite: false,
-      gestureOrientation: 'vertical',
-      autoResize: true,
-    })
-    lenisRef.current = lenis
-    let raf = 0
-    const rafFn = (time:number)=>{ lenis.raf(time); raf = requestAnimationFrame(rafFn) }
-    raf = requestAnimationFrame(rafFn)
-    const onResize = ()=> lenis.resize()
-    window.addEventListener('resize', onResize)
-    return ()=>{
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', onResize)
-      lenis.destroy()
-      lenisRef.current = null
-    }
-  },[])
-  useEffect(()=>{
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if(prefersReduced){ window.scrollTo({top:0, behavior:'auto'}); return }
-    lenisRef.current?.scrollTo(0, { immediate:false, duration:1.1, easing:(t:number)=>1-Math.pow(1-t,3) })
-    // fallback
-    setTimeout(()=> window.scrollTo({top:0, behavior:'smooth'}), 40)
+    window.scrollTo({top:0, behavior: prefersReduced ? 'auto' : 'smooth'})
   },[loc.pathname])
-  return lenisRef
+  return null
 }
 
 function Layout({ children, bottomActive, setBottomActive }:{ children:React.ReactNode, bottomActive: 'colleges'|'checklist'|null, setBottomActive:(v:'colleges'|'checklist'|null)=>void }){
